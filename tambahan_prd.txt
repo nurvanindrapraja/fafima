@@ -1,0 +1,7 @@
+Tambahan untuk dokumen PRD:
+- Owner dan Semua member dapat melihat dashboard, termasuk advice yang ditampilkan oleh aplikasi
+- advice yang ditampilkan di akun member kalimat AI-nya disensor menjadi kalimat umum (agregat) jika dilihat oleh Member biasa. namun advice yang ditampilkan di akun owner, tetaplah advice spesifik (member tidak dapat melihat advice spesifik)
+- Owner/Member bisa menabung/memasukkan uang secara manual ke target kapan saja di tengah bulan (misalnya di tanggal 17) atau di awal bulan
+- user melakukan input manual (transfer internal) untuk saldo bulanan dari Dompet Keluarga ke Dompet Target (di awal bulan user tidak perlu memasukkan dana, karena sudah otomatis masuk)
+- untuk anggota tanggungan (tidak berpenghasilan), Owner harus menggunakan metode "Nominal Tetap" (misal: jajan Rp 1.000.000), bukan persentase.
+- user yang pindah grup keluarga otomatis memulai cashflow dan saldonya dari Nol di keluarga barunya (seperti kehidupan baru).

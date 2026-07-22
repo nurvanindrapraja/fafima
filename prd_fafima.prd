@@ -1,0 +1,197 @@
+# PRODUCT REQUIREMENTS DOCUMENT (PRD)
+
+## Aplikasi Pencatatan Keuangan Keluarga
+
+**Nama Produk:** Family Finance Manager
+**Versi Dokumen:** 1.1 (Diperbarui)
+**Status:** Final Draft
+**Platform:** Web Application & Progressive Web App (PWA)
+**Target Pengguna:** Keluarga, pasangan suami-istri, keluarga besar, individu yang ingin mengelola keuangan secara bersama maupun personal.
+
+---
+
+## 1. Ringkasan Produk
+Family Finance Manager adalah aplikasi pencatatan dan pengelolaan keuangan keluarga berbasis web yang dapat diakses melalui browser maupun diinstal sebagai Progressive Web App (PWA) pada smartphone Android dan iPhone.
+
+Aplikasi memungkinkan beberapa anggota keluarga bergabung dalam satu grup keluarga menggunakan kode unik atau QR Code. Seluruh pemasukan dan pengeluaran keluarga direkap secara terpusat. Satu akun hanya dapat tergabung dalam satu keluarga (Single Family).
+
+Selain fitur pencatatan transaksi, aplikasi juga menyediakan:
+* Monitoring kesehatan keuangan keluarga.
+* Pengaturan limit pengeluaran (Keluarga & Individu).
+* Analisis pengeluaran berbasis AI.
+* OCR struk otomatis.
+* Perencanaan target keuangan dengan persetujuan bersama.
+* Reminder tabungan dan target.
+
+## 2. Tujuan Produk
+**Tujuan Bisnis**
+* Menjadi platform pengelolaan keuangan keluarga yang mudah digunakan.
+* Membantu keluarga mengontrol pengeluaran.
+* Membantu keluarga mencapai target finansial.
+* Meningkatkan kesadaran finansial melalui analisis dan rekomendasi.
+
+**Tujuan Pengguna**
+* Mencatat pemasukan dan pengeluaran.
+* Mengetahui kondisi keuangan keluarga secara real-time.
+* Mencegah pengeluaran berlebihan.
+* Merencanakan tujuan keuangan masa depan.
+* Berkolaborasi dalam mengelola keuangan keluarga.
+
+## 3. User Persona
+**Kepala Keluarga (Owner)**
+* **Profil:** Usia 30–50 tahun, memiliki penghasilan tetap, bertanggung jawab terhadap keuangan keluarga.
+* **Kebutuhan:** Memantau kondisi keuangan keluarga, mengontrol pengeluaran (limit), menentukan visibilitas data, mencapai target finansial.
+
+**Ibu Rumah Tangga (Bisa Owner / Member)**
+* **Profil:** Mengelola pengeluaran sehari-hari.
+* **Kebutuhan:** Input transaksi dengan cepat, upload struk tanpa mengetik manual.
+
+**Anggota Keluarga (Member)**
+* **Profil:** Anak dewasa atau anggota keluarga lainnya.
+* **Kebutuhan:** Mencatat pemasukan dan pengeluaran pribadi, tetap berkontribusi terhadap keuangan keluarga, menyetujui target.
+
+**Admin Aplikasi (Superadmin)**
+* **Profil:** Administrator sistem di luar keluarga.
+* **Kebutuhan:** Mengelola sistem, support pengguna, melihat data analitik/rekap untuk perbaikan tanpa melanggar privasi rincian transaksi pengguna.
+
+## 4. Ruang Lingkup Produk
+**Termasuk**
+* Registrasi & Login pengguna, Verifikasi email
+* Manajemen keluarga (Single Family per account)
+* Pencatatan pemasukan & pengeluaran (Manual & OCR)
+* Dashboard analitik (Rekap & Rincian)
+* Limit pengeluaran (Keluarga & Member)
+* Target keuangan (Approval flow)
+* Notifikasi & Reminder
+* AI recommendation
+
+**Tidak Termasuk (Versi Awal)**
+* Integrasi bank otomatis
+* Integrasi e-wallet
+* Pembayaran digital
+* Investasi dan trading
+
+## 5. Fitur Utama
+
+### 5.1 Registrasi dan Autentikasi
+* **Registrasi:** Nama lengkap, Email, Password, Konfirmasi.
+* **Verifikasi Email:** Wajib sebelum menggunakan aplikasi.
+* **Login & Reset Password:** Melalui email.
+
+### 5.2 Manajemen Keluarga
+* **Membuat Keluarga:** Akun yang menginisiasi otomatis menjadi Kepala Keluarga (Owner).
+* **Bergabung ke Keluarga:** Menggunakan Kode Keluarga yang digenerate oleh Owner atau scan QR Code. Satu akun hanya bisa di satu keluarga.
+* **Mengeluarkan Anggota:** Owner berhak mengeluarkan (*kick*) anggota dari keluarga.
+
+### 5.3 Pencatatan Pendapatan
+* **Jenis:** Bulanan (Gaji, Pensiun), Mingguan (Upah), Harian (Honor, Freelance, Jasa, Penjualan).
+* **Frekuensi Input:** Fleksibel. Pendapatan tidak harus dientri tiap bulan, bisa dilakukan lebih dari satu bulan (contoh: tiga bulan sekali).
+* **Field:** Tanggal, Nominal, Jenis pendapatan, Sumber, Catatan.
+
+### 5.4 Pencatatan Pengeluaran
+* **Input Manual Field:** Tanggal, Nominal, Kategori, Deskripsi, Lampiran.
+* **Upload Struk:** Upload gambar (JPG, JPEG, PNG) atau foto langsung melalui kamera.
+
+### 5.5 Kategori Pengeluaran
+* **Kategori Default:** Secara default sistem menyediakan kategori pengeluaran umum (Konsumsi, Transportasi, Pendidikan, Kesehatan, dll). Owner kelak dapat menyesuaikannya dengan kebutuhan keluarga.
+* **Kategori Kustom:** Dapat dibuat oleh Owner atau Member dan akan tersedia untuk seluruh anggota keluarga. Member lain tidak bisa mengubah nama kategori yang dibuat oleh Member tertentu, kecuali Owner. Kategori yang sudah memiliki transaksi tertaut **tidak dapat dihapus**. Kategori tanpa transaksi hanya dapat dihapus oleh pembuatnya atau oleh Owner.
+
+### 5.6 Limit Pengeluaran
+* **Skala Limit:** Owner dapat menyetel limit pengeluaran untuk **keseluruhan keluarga** dan limit spesifik untuk **masing-masing member**.
+* **Metode:** Berdasarkan Persentase Pendapatan (misal 80%) atau Nominal Tetap (misal Rp7.500.000). Khusus untuk anggota tanggungan (tidak berpenghasilan), Owner **wajib** menggunakan metode "Nominal Tetap" (contoh: limit jajan Rp1.000.000).
+* **Status Limit:** Aman (0-79%), Waspada (80-89%), Hampir Melebihi (90-99%), Melebihi Limit (100%+).
+
+### 5.7 Smart Spending Advisor
+* Ketika pengeluaran mendekati atau melebihi limit, sistem memberikan analisis kategori yang meningkat dan saran pengurangan.
+
+### 5.8 Dashboard
+* **Ringkasan:** Total pendapatan, Total pengeluaran, Saldo, Sisa limit, Jumlah tabungan.
+* **Grafik Time Series:** Harian, Mingguan, Bulanan.
+* **Analisis Kategori:** Pie Chart, Tren (Line Chart).
+
+### 5.9 Penilaian Kesehatan Keuangan
+* Penilaian status (Hemat, Sedang, Boros) dan Analisis AI (Penyebab dan Saran perbaikan).
+
+### 5.10 Target Keuangan
+* **Contoh:** Umroh, Liburan, Rumah, Kendaraan, Dana Pendidikan, Dana Darurat.
+* **Alur Persetujuan Target:** Hanya Owner yang mengusulkan target. Semua Member **harus memberikan persetujuan (approve)**. Jika ditolak, Owner harus memperbarui target. Jika ada Member yang pasif berbulan-bulan (tidak login dan tidak ada transaksi), Owner dapat melakukan *bypass* persetujuan khusus untuk Member tersebut (maksimal menunggu persetujuan 2 hari). Anggota baru otomatis terikat pada target disepakati.
+* **Kompensasi:** Sistem menawarkan opsi jika tabungan tidak mencapai target bulan berjalan (Tambah target bulan depan, geser waktu, kurangi nilai target).
+* **Sumber Dana (Funding Target):** Pengisian dana target di awal bulan dialokasikan secara otomatis (dari sisa saldo bulan lalu). *Owner/Member* juga dapat melakukan *input* manual (transfer internal dari Dompet Keluarga ke Dompet Target) kapan saja di tengah atau awal bulan.
+
+### 5.11 Notifikasi dan Reminder
+* Reminder transaksi, Reminder limit, Reminder target pencapaian, dan Notifikasi pencapaian target.
+
+## 6. Business Rules & Logic
+
+Berdasarkan kebutuhan spesifik aplikasi, berikut adalah logika dan aturan bisnis yang berlaku:
+
+1. **Aturan Single Family:** Tidak diperkenankan Multi Family. Satu akun (email) hanya dapat tergabung di 1 (satu) entitas *Family* pada satu waktu.
+2. **Kewenangan Manajemen Anggota:** Hanya *Owner* yang dapat menerima (lewat kode/QR) dan mengeluarkan (*kick*) anggota.
+3. **Visibilitas Data & Dashboard (Privasi Member):** *Owner* dapat membatasi *Member* agar hanya melihat rekap data atau diizinkan melihat rincian transaksi anggota lain. Seluruh anggota dapat mengakses *Dashboard* beserta saran AI. Namun, saran AI untuk *Member* akan **disensor menjadi kalimat umum/agregat**, sedangkan *Owner* tetap melihat saran yang sangat spesifik.
+4. **Pembatasan Visibilitas Admin Aplikasi:** *Admin Aplikasi* (Superadmin) memiliki akses untuk memanajemen *Family* (menambah, menghapus, mengedit anggota via backend), namun **tidak bisa** melihat rincian data transaksi pengguna secara spesifik. *Admin Aplikasi* hanya dapat melihat data agregat/rekapitulasi.
+5. **Logika Saldo Akhir Bulan & Total Pendapatan:** Di akhir bulan pencatatan, jika terdapat **Sisa Saldo Keluarga**, aplikasi akan memberikan rekomendasi kepada *Owner* untuk memasukkannya ke *Tabungan*. Jika diabaikan, sisa saldo akan menambah jumlah saldo di bulan berikutnya (akumulatif dari awal aplikasi dipakai). "Total Pendapatan" pada bulan berjalan = Saldo akumulasi bulan-bulan sebelumnya + Pemasukan bulan ini.
+6. **Retensi Data Anggota Keluar & Pindah Keluarga:** Jika *Member* keluar/dikeluarkan, riwayat transaksinya **tetap dipertahankan** sebagai arsip *Family* lama. Jika *Member* tersebut kemudian bergabung ke grup keluarga baru, maka *cashflow* dan saldonya akan **dimulai dari Nol** (seperti kehidupan baru).
+7. **Peringatan Defisit (Saldo Minus):** Jika pengeluaran yang diinput lebih besar dari "Total Pendapatan" (seperti definisi pada poin 5), aplikasi akan memberikan *warning*. Jika *user* melanjutkan, transaksi diproses dan status keuangan/saldo keluarga menjadi **Minus (Defisit)**.
+8. **Pengusulan & Persetujuan Target Keuangan:** Inisiasi murni wewenang *Owner*. Jika ditolak, target harus diperbarui. Namun, jika ada *Member* pasif, *Owner* dapat melakukan *bypass* persetujuan khusus untuk *Member* tersebut (maksimal menunggu 2 hari). Anggota baru otomatis menyetujui target berjalan.
+9. **Kategori Pengeluaran Bersama:** Kategori kustom dapat digunakan semua anggota. Pengubahan nama kategori kustom hanya bisa dilakukan oleh pembuat atau *Owner*. Kategori **tidak bisa dihapus** jika sudah memiliki riwayat transaksi tertaut. Jika belum ada transaksi, pembuat atau *Owner* bisa menghapusnya.
+10. **Fleksibilitas Input Pendapatan:** Jeda input pendapatan bebas (tidak harus terisi tiap bulan). Bisa dilakukan misalnya 3 bulan sekali sesuai penerimaan *user*.
+11. **Batas Waktu Edit/Hapus Transaksi:** *Member* hanya dapat mengedit/menghapus transaksinya sendiri maksimal 3 hari sejak dientri. Setelah 3 hari, hak edit/hapus hanya dimiliki *Owner*. Seluruh perubahan akan mencetak *log* (riwayat ubahan) yang bisa dilihat oleh semua anggota keluarga.
+12. **Pemindahan Hak Kepemilikan (Transfer Ownership) & Penghapusan:** 
+     * Jika *Owner* menekan tombol "Keluar dari Keluarga", sistem memblokir tindakan ini dan mewajibkan *Owner* menekan tombol "Transfer Ownership" terlebih dahulu.
+     * Jika *Owner* secara sukarela mengalihkan peran ke *Member* lain, mantan *Owner* otomatis turun statusnya menjadi *Member* biasa.
+     * Jika *Owner* dihapus paksa oleh Admin dan ada anggota lain, peran *Owner* dilimpahkan ke *Member* terlama (histori utuh). Namun, jika *Owner* adalah **satu-satunya anggota** dan dihapus, maka entitas "Keluarga" tersebut ikut terhapus beserta transaksinya.
+
+## 7. Role-Permission Matrix
+
+| Fitur / Aksi | Kepala Keluarga (Owner) | Anggota Keluarga (Member) | Admin Aplikasi (Superadmin) |
+| :--- | :---: | :---: | :---: |
+| Menginisiasi Keluarga Baru | ✅ | ❌ | ✅ |
+| Join Keluarga (Kode/QR) | ❌ (Sbg Owner di Keluarga sendiri) | ✅ | ❌ |
+| Mengeluarkan Anggota Keluarga | ✅ | ❌ | ✅ |
+| Edit Profil & Data Member | ✅ (Untuk keluarganya) | ✅ (Data Sendiri) | ✅ (Seluruh Sistem) |
+| Input Pemasukan & Pengeluaran | ✅ | ✅ | ❌ |
+| Edit/Hapus Transaksi Sendiri (<= 3 Hari) | ✅ | ✅ | ❌ |
+| Edit/Hapus Transaksi Member Lain / (> 3 Hari) | ✅ | ❌ | ❌ |
+| Melihat Log Perubahan Transaksi | ✅ | ✅ | ❌ |
+| Membuat Kategori Pengeluaran Baru | ✅ (Bisa dipakai semua) | ✅ (Bisa dipakai semua) | ❌ |
+| Mengedit/Menghapus Kategori Kustom | ✅ (Semua) | ⚠️ (Yg dibuatnya & belum ada transaksi) | ❌ |
+| Keluar dari Keluarga (Leave Family) | ❌ (Harus Transfer Owner) | ✅ | ❌ |
+| Mengatur Limit (Keluarga & Individu) | ✅ | ❌ | ❌ |
+| Mengusulkan Target Keuangan | ✅ | ❌ | ❌ |
+| Menyetujui Target Keuangan | ✅ (Otomatis Setuju) | ✅ (Harus Setuju Semua) | ❌ |
+| Melakukan Bypass Persetujuan Target | ✅ (Jika Member pasif) | ❌ | ❌ |
+| Mengatur Visibilitas Data Member | ✅ | ❌ | ❌ |
+| Melihat Rincian Transaksi Anggota | ✅ | ⚠️ (Bergantung izin Owner) | ❌ |
+| Melihat Rekap Total Keuangan | ✅ | ✅ | ✅ (Agregat) |
+| Melimpahkan Kepemilikan (Transfer Role) | ✅ | ❌ | ❌ |
+
+## 8. Progressive Web App (PWA), UX & NFR
+* **Fitur PWA:** Install ke smartphone, Tampilan mobile, Push notification, Offline draft transaksi, Sinkronisasi saat online.
+* **User Experience (UX) & Interaksi:** Seluruh aksi manipulasi data (Create, Read/Search, Update, Delete - CRUD) **wajib menggunakan metode AJAX** (tanpa *reload* halaman penuh). Selama proses AJAX berlangsung, sistem harus menampilkan **Loading Bar/Spinner** dan secara otomatis melakukan **Disable Tombol (Action Button)** untuk mencegah *double-submit*.
+* **Non Functional Requirements:** Respons < 3 detik, Dashboard < 5 detik, OCR < 10 detik. Uptime target 99%.
+* **Keamanan:** HTTPS, Password Hashing, CSRF & XSS Protection, Session Management, Audit Log.
+
+## 9. Teknologi & Arsitektur
+* **Frontend:** Laravel 12 (Blade), Livewire, Alpine.js, Tailwind CSS, Chart.js, PWA.
+* **Backend:** Laravel 12, PHP 8.4+
+* **Database & Cache:** MySQL 8.x, Redis.
+* **Layanan Eksternal:** Google Vision OCR / Azure AI, OpenAI / Azure OpenAI API, AWS S3/MinIO.
+
+## 10. Roadmap Pengembangan
+* **Fase 1 (MVP):** Registrasi, Single Family, Join via Code/QR, Pencatatan & Kategori, Limit (Keluarga & Member), Dashboard Dasar, Target Keuangan, PWA, Visibilitas Data.
+* **Fase 2:** OCR Struk, Auto Categorization, Smart Spending Advisor, Push Notification.
+* **Fase 3:** AI Goal Planner, Cashflow Prediction, Export (PDF, Excel), Integrasi WhatsApp.
+
+## 11. Panduan Desain (UI/UX Guideline)
+Aplikasi **Family Finance Manager** mengusung tema **Modern Blue (Dark Mode & Glassmorphism)**. 
+Warna biru dipilih untuk melambangkan teknologi tinggi, manajemen yang rapi, rasa aman (trust), dan optimisme finansial.
+
+* **Primary Color (Biru Utama):** Digunakan untuk tombol *action*, indikator grafik utama, dan *progress bar* target tabungan.
+* **Background (Latar Belakang):** Menggunakan gradasi biru gelap (*Deep Navy* atau *Midnight Blue*) yang elegan, menciptakan suasana premium dan menonjolkan data.
+* **Surface/Cards (Komponen):** Menggunakan efek *Glassmorphism* (transparan dengan *background blur*) atau warna solid *slate blue* untuk memisahkan antar widget data.
+* **Typography:** Menggunakan *font* modern *Sans-Serif* (seperti Inter, Roboto, atau Outfit) yang bersih dan terstruktur rapi.
+* **Bahasa Antarmuka (Language):** Seluruh elemen visual (menu, tombol, notifikasi, pesan *error*) **wajib menggunakan Bahasa Indonesia** yang lugas dan mudah dipahami.
+* **Nuansa Keseluruhan:** *High-tech vibe*, *neat layout*, *beautiful UI*.
+
+**Mockup Referensi Desain Dashboard:**
+![UI Mockup Dashboard Fafima](/Users/bapenda/.gemini/antigravity-ide/brain/c6dd3688-5e8b-42a7-bfad-c47766ebed42/fafima_dashboard_ui_1784120867198.png)
