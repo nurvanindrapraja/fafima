@@ -28,8 +28,11 @@ class OpenAIService
         ];
     }
 
-    private function cleanJsonResponse(string $text): ?array
+    private function cleanJsonResponse(?string $text): ?array
     {
+        if (empty($text)) {
+            return null;
+        }
         $text = preg_replace('/```(?:json)?\s*(.*?)\s*```/s', '$1', trim($text));
         return json_decode($text, true);
     }
@@ -78,7 +81,9 @@ Do not wrap the JSON in markdown code blocks, just return raw JSON.";
 
             if ($response->successful()) {
                 $text = $response->json('content.0.text');
-                return $this->cleanJsonResponse($text);
+                if (is_string($text)) {
+                    return $this->cleanJsonResponse($text);
+                }
             }
 
             Log::error('Claude Parse Receipt Failed', ['response' => $response->body()]);
@@ -122,12 +127,14 @@ Return ONLY raw JSON without markdown formatting.";
 
             if ($response->successful()) {
                 $text = $response->json('content.0.text');
-                $decoded = $this->cleanJsonResponse($text);
-                
-                return $decoded ?? [
-                    'owner_advice' => 'Tidak dapat menganalisis data keuangan saat ini.',
-                    'member_advice' => 'Mari berhemat dan kelola pengeluaran dengan bijak.'
-                ];
+                if (is_string($text)) {
+                    $decoded = $this->cleanJsonResponse($text);
+                    
+                    return $decoded ?? [
+                        'owner_advice' => 'Tidak dapat menganalisis data keuangan saat ini.',
+                        'member_advice' => 'Mari berhemat dan kelola pengeluaran dengan bijak.'
+                    ];
+                }
             }
 
             return [
