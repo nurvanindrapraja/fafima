@@ -13,12 +13,14 @@ class FamilySettings extends Component
     public ?int $transferingToId = null;
     public bool $showTransferConfirm = false;
     public bool $allowMemberViewAllTransactions = true;
+    public string $familyName = '';
 
     public function mount()
     {
         $user = Auth::user();
         if ($user->family) {
             $this->allowMemberViewAllTransactions = $user->family->allow_member_view_all_transactions;
+            $this->familyName = $user->family->name;
         }
     }
 
@@ -28,6 +30,18 @@ class FamilySettings extends Component
         if ($user->role === 'owner') {
             $user->family->update(['allow_member_view_all_transactions' => $value]);
             session()->flash('success', 'Pengaturan visibilitas berhasil diperbarui!');
+        }
+    }
+
+    public function updateFamilyName()
+    {
+        $user = Auth::user();
+        if ($user->role === 'owner') {
+            $this->validate([
+                'familyName' => 'required|string|max:255',
+            ]);
+            $user->family->update(['name' => $this->familyName]);
+            session()->flash('success', 'Nama keluarga berhasil diperbarui!');
         }
     }
 

@@ -19,9 +19,23 @@
         <div class="card-glass rounded-2xl border border-blue-500/20 p-6 space-y-4">
             <h2 class="font-semibold text-white">Informasi Keluarga</h2>
             <div class="space-y-3">
-                <div class="py-2 border-b border-slate-700/30">
-                    <p class="text-xs text-slate-400 mb-0.5">Nama Keluarga</p>
-                    <p class="text-sm font-semibold text-white">{{ $family?->name }}</p>
+                <div class="py-2 border-b border-slate-700/30" x-data="{ editingName: false }">
+                    <p class="text-xs text-slate-400 mb-0.5 flex items-center justify-between">
+                        Nama Keluarga
+                        @if(Auth::user()->role === 'owner')
+                        <button @click="editingName = !editingName" class="text-blue-400 hover:text-blue-300 transition-colors" x-text="editingName ? 'Batal' : 'Ubah'"></button>
+                        @endif
+                    </p>
+                    <div x-show="!editingName">
+                        <p class="text-sm font-semibold text-white">{{ $family?->name }}</p>
+                    </div>
+                    @if(Auth::user()->role === 'owner')
+                    <div x-show="editingName" style="display: none;" class="mt-2 flex gap-2">
+                        <input type="text" wire:model="familyName" wire:keydown.enter="updateFamilyName" class="flex-1 bg-slate-900 border border-slate-700 text-white rounded-lg text-sm px-3 py-1.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+                        <button wire:click="updateFamilyName" @click="editingName = false" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors">Simpan</button>
+                    </div>
+                    @error('familyName') <span class="text-xs text-rose-400 mt-1 block">{{ $message }}</span> @enderror
+                    @endif
                 </div>
                 <div class="py-2 border-b border-slate-700/30">
                     <p class="text-xs text-slate-400 mb-1">Kode Undangan</p>
