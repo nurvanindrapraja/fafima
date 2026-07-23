@@ -139,6 +139,8 @@ Return ONLY raw JSON without markdown formatting.";
                 }
             }
 
+            Log::error('Claude Advisor API Failed', ['status' => $response->status(), 'response' => $response->body()]);
+
             return [
                 'owner_advice' => 'Gagal memuat saran AI.',
                 'member_advice' => 'Gagal memuat saran AI.'
