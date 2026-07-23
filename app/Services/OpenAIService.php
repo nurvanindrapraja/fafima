@@ -80,7 +80,15 @@ Do not wrap the JSON in markdown code blocks, just return raw JSON.";
                 ]);
 
             if ($response->successful()) {
-                $text = $response->json('content.0.text');
+                $contents = $response->json('content', []);
+                $text = null;
+                foreach ($contents as $block) {
+                    if (isset($block['type']) && $block['type'] === 'text') {
+                        $text = $block['text'] ?? null;
+                        break;
+                    }
+                }
+                
                 if (is_string($text)) {
                     return $this->cleanJsonResponse($text);
                 }
@@ -118,7 +126,7 @@ Return ONLY raw JSON without markdown formatting.";
                 ->timeout(20)
                 ->post('https://api.anthropic.com/v1/messages', [
                     'model' => $this->modelHaiku,
-                    'max_tokens' => 500,
+                    'max_tokens' => 1000,
                     'system' => $systemPrompt,
                     'messages' => [
                         ['role' => 'user', 'content' => 'Please generate the advice JSON.']
@@ -126,7 +134,15 @@ Return ONLY raw JSON without markdown formatting.";
                 ]);
 
             if ($response->successful()) {
-                $text = $response->json('content.0.text');
+                $contents = $response->json('content', []);
+                $text = null;
+                foreach ($contents as $block) {
+                    if (isset($block['type']) && $block['type'] === 'text') {
+                        $text = $block['text'] ?? null;
+                        break;
+                    }
+                }
+
                 if (is_string($text)) {
                     $decoded = $this->cleanJsonResponse($text);
                     
