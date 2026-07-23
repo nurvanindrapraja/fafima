@@ -14,12 +14,16 @@
         loading: false, 
         errorMessage: '',
         errors: {},
-        async login() {
+        async login(e) {
             this.loading = true;
             this.errorMessage = '';
             this.errors = {};
             $dispatch('login-started');
             
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.remember = formData.has('remember');
+
             try {
                 const response = await fetch('{{ route('login') }}', {
                     method: 'POST',
@@ -28,18 +32,17 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content')
                     },
-                    body: JSON.stringify({
-                        email: this.email,
-                        password: this.password,
-                        remember: this.remember
-                    })
+                    credentials: 'same-origin',
+                    body: JSON.stringify(data)
                 });
 
-                if (response.ok || response.status === 204) {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else if (response.ok || response.status === 204) {
                     window.location.href = '{{ route('dashboard') }}';
                 } else if (response.status === 422) {
-                    const data = await response.json();
-                    this.errors = data.errors;
+                    const resData = await response.json();
+                    this.errors = resData.errors;
                     this.loading = false;
                     $dispatch('login-finished');
                 } else {
