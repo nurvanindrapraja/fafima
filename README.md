@@ -1,58 +1,75 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+  <img src="public/icon_fafima_small.png" alt="FAFIMA Logo" width="100" />
+  <h1>Family Finance Manager (FAFIMA)</h1>
+  <p><strong>Aplikasi Pencatatan dan Pengelolaan Keuangan Keluarga Pintar Berbasis AI</strong></p>
+</div>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## 📖 Tentang FAFIMA
+**Family Finance Manager (FAFIMA)** adalah aplikasi pengelolaan keuangan keluarga modern yang dirancang untuk membantu keluarga, pasangan, maupun individu dalam mencatat, memonitor, dan merencanakan keuangan mereka secara kolaboratif. 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Dibangun sebagai **Progressive Web App (PWA)**, FAFIMA dapat diakses dengan cepat melalui browser maupun diinstal langsung di *smartphone* Anda layaknya aplikasi native.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 👨‍👩‍👧‍👦 **Manajemen Keluarga (Single Family):** Kolaborasi keuangan dalam satu payung keluarga. Undang anggota keluarga dengan mudah menggunakan *QR Code* atau Kode Unik.
+- 📸 **OCR Struk Cerdas:** Malas mengetik? Cukup foto atau unggah struk belanja Anda, dan AI (OpenAI Vision) akan secara otomatis mengenali dan mencatat pengeluaran Anda.
+- 🤖 **Smart Spending Advisor:** Asisten keuangan berbasis AI (Claude / OpenAI) yang siap menganalisis pola pengeluaran Anda, mengingatkan jika boros, dan memberikan saran penghematan.
+- 🎯 **Perencanaan Target (Goals):** Rencanakan liburan, dana pendidikan, atau beli kendaraan bersama-sama. Dilengkapi sistem *approval* seluruh anggota keluarga.
+- 📊 **Dashboard & Analitik:** Pantau arus kas harian, mingguan, dan bulanan melalui visualisasi grafik yang memanjakan mata.
+- 🛡️ **Limit Pengeluaran:** Atur batas pengeluaran maksimum untuk keseluruhan keluarga maupun limit jajan spesifik untuk setiap individu/anak.
+- 🔔 **Sistem Notifikasi:** Dapatkan pengingat *real-time* ketika pengeluaran sudah mendekati batas aman.
 
-## Learning Laravel
+## 🚀 Teknologi yang Digunakan
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+FAFIMA mengusung arsitektur *TALL Stack* yang modern dan responsif:
+- **Framework:** Laravel 12 (PHP 8.4+)
+- **Frontend:** Livewire 3, Alpine.js, Tailwind CSS
+- **Database:** MySQL 8.x
+- **Artificial Intelligence:** OpenAI / Anthropic Claude API
+- **PWA:** Terintegrasi penuh dengan Service Workers dan Web Manifest
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🛠️ Panduan Instalasi (Lokal)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Jika Anda ingin menjalankan aplikasi ini di komputer lokal untuk pengembangan, ikuti langkah berikut:
 
-## Agentic Development
+1. **Kloning Repository**
+   ```bash
+   git clone https://github.com/nurvanindrapraja/fafima.git
+   cd fafima
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+2. **Instalasi Dependensi PHP & Node**
+   ```bash
+   composer install
+   npm install
+   ```
 
-```bash
-composer require laravel/boost --dev
+3. **Pengaturan Lingkungan (.env)**
+   Duplikat file `.env.example` menjadi `.env`, lalu konfigurasikan koneksi *database* dan kunci API AI Anda.
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-php artisan boost:install
-```
+4. **Migrasi Database**
+   ```bash
+   php artisan migrate
+   ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+5. **Jalankan Aplikasi**
+   Jalankan server PHP dan kompilasi aset secara bersamaan:
+   ```bash
+   php artisan serve
+   npm run dev
+   ```
+   Aplikasi kini dapat diakses melalui `http://127.0.0.1:8000`.
 
-## Contributing
+## 👥 Hak Akses (Roles)
+- **Kepala Keluarga (Owner):** Menginisiasi grup keluarga, menyetujui anggota, mengatur limit pengeluaran, menghapus histori transaksi, dan mengusulkan target keuangan.
+- **Anggota (Member):** Melakukan input transaksi (pemasukan/pengeluaran), melihat analitik (opsional), dan menyetujui target keuangan.
+- **Superadmin:** Mengelola seluruh data *Family* secara sistem tanpa melanggar privasi rincian transaksi pengguna.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 📄 Lisensi
+FAFIMA adalah perangkat lunak hak milik (*proprietary*) yang dikembangkan untuk manajemen keuangan tertutup.
