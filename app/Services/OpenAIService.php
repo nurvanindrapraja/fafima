@@ -134,6 +134,8 @@ Return ONLY raw JSON without markdown formatting.";
                         'owner_advice' => 'Tidak dapat menganalisis data keuangan saat ini.',
                         'member_advice' => 'Mari berhemat dan kelola pengeluaran dengan bijak.'
                     ];
+                } else {
+                    Log::error('Claude API returned 200 OK but text is null', ['response' => $response->body()]);
                 }
             }
 
