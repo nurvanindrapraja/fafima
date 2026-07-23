@@ -55,6 +55,10 @@
                     class="btn-primary w-full py-2 rounded-xl text-sm font-medium" id="btn-salin-kode-settings">
                     Salin Kode Undangan
                 </button>
+                <button x-data @click="$dispatch('open-qr-modal')" 
+                    class="w-full py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white transition-all text-sm font-medium">
+                    Tampilkan QR Code
+                </button>
                 <button wire:click="regenerateCode" wire:loading.attr="disabled"
                     class="w-full py-2 rounded-xl border border-slate-600 text-slate-300 hover:border-slate-500 hover:text-white transition-all text-sm"
                     id="btn-perbarui-kode">
@@ -155,5 +159,27 @@
         </div>
     </div>
     @endif
+
+    {{-- QR Code Modal --}}
+    <div x-data="{ open: false }" 
+         x-show="open" 
+         @open-qr-modal.window="open = true" 
+         style="display: none;"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div @click.away="open = false" class="w-full max-w-sm card-glass rounded-2xl p-6 border border-slate-700/60 shadow-2xl text-center">
+            <h3 class="text-white font-bold text-lg mb-2">QR Code Undangan</h3>
+            <p class="text-slate-400 text-sm mb-6">Minta anggota keluarga memindai QR Code ini untuk bergabung.</p>
+            
+            <div class="bg-white p-4 rounded-xl inline-block mb-6">
+                @if($family?->code)
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode(route('family.invite', $family->code)) }}" alt="QR Code" class="w-48 h-48 mx-auto">
+                @endif
+            </div>
+
+            <button @click="open = false" class="w-full py-2 rounded-xl border border-slate-600 text-slate-300 hover:text-white hover:bg-slate-700 transition-all text-sm">
+                Tutup
+            </button>
+        </div>
+    </div>
 
 </div>

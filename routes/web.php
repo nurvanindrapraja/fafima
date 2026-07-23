@@ -15,6 +15,15 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/invite/{code}', function ($code) {
+    session(['invitation_code' => $code]);
+    
+    if (Auth::check()) {
+        return redirect()->route('onboarding.index');
+    }
+    return redirect()->route('register');
+})->name('family.invite');
+
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');

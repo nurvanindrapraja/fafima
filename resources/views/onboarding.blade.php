@@ -14,7 +14,7 @@
                             @csrf
                             <div>
                                 <x-input-label for="code" value="Kode Undangan" class="text-slate-300" />
-                                <x-text-input id="code" class="block mt-1 w-full bg-slate-800 border-slate-600 text-white focus:border-blue-500 focus:ring-blue-500 uppercase" type="text" name="code" :value="old('code')" required placeholder="Contoh: ABCDEF12" />
+                                <x-text-input id="code" class="block mt-1 w-full bg-slate-800 border-slate-600 text-white focus:border-blue-500 focus:ring-blue-500 uppercase" type="text" name="code" :value="old('code', session('invitation_code'))" required placeholder="Contoh: ABCDEF12" />
                                 <x-input-error :messages="$errors->get('code')" class="mt-2" />
                             </div>
 
