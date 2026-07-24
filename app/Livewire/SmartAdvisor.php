@@ -14,16 +14,22 @@ class SmartAdvisor extends Component
     public string $ownerAdvice = '';
     public string $memberAdvice = '';
     public bool $isLoading = true;
+    public bool $allowAi = true;
 
     public function mount()
     {
-        // Don't block render, load data async or fetch via init
-        // For simplicity, we can load it in init or render. We will use a wire:init to load it so page loads fast.
+        $user = Auth::user();
+        $this->allowAi = $user ? (bool) $user->allow_ai_receipt : true;
     }
 
     public function loadAdvice()
     {
         $user = Auth::user();
+        if (!$user || !$user->allow_ai_receipt) {
+            $this->isLoading = false;
+            return;
+        }
+
         $familyId = $user->family_id;
         $month = now()->month;
         $year = now()->year;
@@ -75,8 +81,10 @@ class SmartAdvisor extends Component
 
     public function render()
     {
+        $user = Auth::user();
         return view('livewire.smart-advisor', [
-            'isOwner' => Auth::user()->role === 'owner'
+            'isOwner' => $user?->role === 'owner',
+            'allowAi' => (bool) $user?->allow_ai_receipt,
         ]);
     }
 }

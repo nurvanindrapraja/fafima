@@ -232,8 +232,8 @@
                                     <input type="hidden" name="allow_ai_receipt" value="0">
                                     <input id="edit_allow_ai_receipt" name="allow_ai_receipt" type="checkbox" value="1" class="w-5 h-5 rounded border-slate-600 bg-slate-900 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-800" x-model="editData.allow_ai_receipt" />
                                     <div class="flex flex-col">
-                                        <label for="edit_allow_ai_receipt" class="text-sm font-medium text-slate-300">Izinkan Fitur AI (Struk)</label>
-                                        <p class="text-xs text-slate-500">Jika dicentang, pengguna ini dapat menggunakan AI untuk membaca gambar struk otomatis.</p>
+                                        <label for="edit_allow_ai_receipt" class="text-sm font-medium text-slate-300">Izinkan Fitur AI (Struk & Smart Advisor)</label>
+                                        <p class="text-xs text-slate-500">Jika dicentang, pengguna ini dapat menggunakan AI (baca struk otomatis & Smart Advisor AI di dashboard).</p>
                                     </div>
                                 </div>
                             </div>

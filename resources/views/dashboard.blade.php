@@ -23,7 +23,9 @@
         </div>
 
         {{-- Smart Advisor --}}
-        <livewire:smart-advisor />
+        @if(Auth::user()->allow_ai_receipt)
+            <livewire:smart-advisor />
+        @endif
 
         {{-- Quick Stats Row --}}
         @php
