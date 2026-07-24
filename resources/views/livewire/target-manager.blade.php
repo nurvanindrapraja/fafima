@@ -240,10 +240,17 @@
                 </button>
             </div>
             
-            <div class="mb-4">
-                <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Jumlah Dana (Rp)</label>
-                <input x-data="currencyInput(@entangle('fund_amount'))" x-model="display" @input="updateValue" type="text" class="input-dark w-full text-lg font-semibold" placeholder="Contoh: 500000">
-                @error('fund_amount') <p class="text-xs text-rose-400 mt-1">{{ $message }}</p> @enderror
+            <div class="space-y-4 mb-4">
+                <div>
+                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Jumlah Dana (Rp)</label>
+                    <input x-data="currencyInput(@entangle('fund_amount'))" x-model="display" @input="updateValue" type="text" class="input-dark w-full text-lg font-semibold" placeholder="Contoh: 500000">
+                    @error('fund_amount') <p class="text-xs text-rose-400 mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="fund-description" class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Keterangan (Opsional)</label>
+                    <input id="fund-description" wire:model="fund_description" type="text" class="input-dark w-full text-sm" placeholder="Contoh: Tabungan gaji bulan Juli">
+                    @error('fund_description') <p class="text-xs text-rose-400 mt-1">{{ $message }}</p> @enderror
+                </div>
             </div>
             
             <p class="text-[10px] text-slate-500 mb-5">Dana akan diambil dari Saldo Keluarga dan dicatat sebagai pengeluaran pendanaan target.</p>
@@ -259,4 +266,162 @@
         </div>
     </div>
     @endif
+
+    {{-- Delete Topup History Confirmation Modal --}}
+    @if ($deletingTopupId)
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="w-full max-w-sm card-glass rounded-2xl p-6 border border-slate-700/60 shadow-2xl text-center">
+            <div class="w-12 h-12 bg-rose-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </div>
+            <h3 class="text-white font-bold text-lg mb-2">Hapus Riwayat Top Up?</h3>
+            <p class="text-slate-400 text-sm mb-6">Data transaksi pengeluaran di saldo keluarga dan dana terkumpul target juga akan otomatis dikurangi/dihapus.</p>
+            <div class="flex gap-3">
+                <button wire:click="cancelDeleteTopup" class="flex-1 py-2 rounded-xl border border-slate-600 text-slate-300 hover:text-white transition-all text-sm">Batal</button>
+                <button wire:click="deleteTopup" wire:loading.attr="disabled" id="btn-konfirmasi-hapus-topup"
+                    class="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold transition-all disabled:opacity-50">
+                    <span wire:loading.remove wire:target="deleteTopup">Hapus</span>
+                    <span wire:loading wire:target="deleteTopup">Menghapus...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Top Up History Section --}}
+    <div class="pt-8 border-t border-slate-700/50 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Riwayat Top Up Dana Target
+                </h2>
+                <p class="text-slate-400 text-xs mt-0.5">Daftar transaksi pendanaan target keuangan keluarga.</p>
+            </div>
+        </div>
+
+        {{-- Filters Bar --}}
+        <div class="card-glass p-4 rounded-2xl border border-slate-700/50 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="text-xs text-slate-400 font-medium block mb-1">Bulan & Tahun</label>
+                    <input type="month" wire:model.live="filterMonth" class="input-dark text-sm py-2 px-3 w-full">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 font-medium block mb-1">Target Keuangan</label>
+                    <select wire:model.live="filterTargetId" class="input-dark text-sm py-2 px-3 w-full">
+                        <option value="">Semua Target</option>
+                        @foreach($targets as $t)
+                            <option value="{{ $t->id }}">{{ $t->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 font-medium block mb-1">Cari Keterangan</label>
+                    <input type="text" wire:model.live.debounce.300ms="filterDescription" placeholder="Kata kunci keterangan..." class="input-dark text-sm py-2 px-3 w-full">
+                </div>
+            </div>
+            @if($filterMonth !== now()->format('Y-m') || $filterDescription !== '' || $filterTargetId !== '')
+                <div class="flex justify-end">
+                    <button wire:click="resetTopupFilters" class="text-xs text-blue-400 hover:text-blue-300 underline transition-colors">
+                        🔄 Reset Filter
+                    </button>
+                </div>
+            @endif
+        </div>
+
+        {{-- Loading Bar for Filter AJAX --}}
+        <div wire:loading wire:target="filterMonth, filterDescription, filterTargetId, resetTopupFilters" class="w-full h-1 bg-slate-700 rounded overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 animate-pulse rounded"></div>
+        </div>
+
+        {{-- History Content Container --}}
+        <div wire:loading.class="opacity-50 transition-opacity" wire:target="filterMonth, filterDescription, filterTargetId, resetTopupFilters">
+            @if($topupHistories->isEmpty())
+                <div class="card-glass rounded-2xl border border-slate-700/50 text-center py-10">
+                    <p class="text-slate-500 text-sm">Tidak ada riwayat top up dana target yang ditemukan.</p>
+                </div>
+            @else
+                {{-- Desktop Table View --}}
+                <div class="hidden md:block card-glass rounded-2xl border border-slate-700/50 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-300">
+                            <thead class="text-xs text-slate-400 uppercase bg-slate-900/60 border-b border-slate-700/50">
+                                <tr>
+                                    <th class="px-5 py-3.5">Tanggal</th>
+                                    <th class="px-5 py-3.5">Target</th>
+                                    <th class="px-5 py-3.5">Jumlah Top Up</th>
+                                    <th class="px-5 py-3.5">Keterangan</th>
+                                    <th class="px-5 py-3.5">Oleh</th>
+                                    @if(Auth::user()->role === 'owner')
+                                        <th class="px-5 py-3.5 text-right">Aksi</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700/40">
+                                @foreach($topupHistories as $history)
+                                    <tr class="hover:bg-slate-700/20 transition-colors">
+                                        <td class="px-5 py-3.5 whitespace-nowrap text-slate-300 font-mono text-xs">
+                                            {{ $history->date->format('d M Y') }}
+                                        </td>
+                                        <td class="px-5 py-3.5 font-medium text-white">
+                                            {{ $history->target?->name ?? 'Target Dihapus' }}
+                                        </td>
+                                        <td class="px-5 py-3.5 font-semibold text-emerald-400 whitespace-nowrap">
+                                            +Rp {{ number_format($history->amount, 0, ',', '.') }}
+                                        </td>
+                                        <td class="px-5 py-3.5 text-slate-300">
+                                            {{ $history->description ?: '-' }}
+                                        </td>
+                                        <td class="px-5 py-3.5 text-slate-400 text-xs">
+                                            {{ $history->user?->name ?? '-' }}
+                                        </td>
+                                        @if(Auth::user()->role === 'owner')
+                                            <td class="px-5 py-3.5 text-right">
+                                                <button wire:click="confirmDeleteTopup({{ $history->id }})" 
+                                                    class="px-2.5 py-1 rounded-lg text-xs bg-rose-600/20 text-rose-300 hover:bg-rose-600/40 border border-rose-500/30 transition-colors">
+                                                    Hapus
+                                                </button>
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Mobile Card View --}}
+                <div class="block md:hidden space-y-3">
+                    @foreach($topupHistories as $history)
+                        <div class="card-glass rounded-2xl border border-slate-700/50 p-4 space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <h4 class="font-semibold text-white text-sm">{{ $history->target?->name ?? 'Target Dihapus' }}</h4>
+                                    <p class="text-[11px] text-slate-500 font-mono">{{ $history->date->format('d M Y') }} · {{ $history->user?->name }}</p>
+                                </div>
+                                <span class="font-bold text-emerald-400 text-sm whitespace-nowrap">
+                                    +Rp {{ number_format($history->amount, 0, ',', '.') }}
+                                </span>
+                            </div>
+                            <div class="text-xs text-slate-300 bg-slate-900/40 p-2.5 rounded-xl border border-slate-700/30">
+                                <span class="text-slate-500 block text-[10px] uppercase font-medium">Keterangan:</span>
+                                {{ $history->description ?: '-' }}
+                            </div>
+                            @if(Auth::user()->role === 'owner')
+                                <div class="flex justify-end pt-1">
+                                    <button wire:click="confirmDeleteTopup({{ $history->id }})"
+                                        class="px-3 py-1.5 rounded-lg text-xs bg-rose-600/20 text-rose-300 hover:bg-rose-600/40 border border-rose-500/30 transition-colors">
+                                        Hapus Riwayat
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
 </div>

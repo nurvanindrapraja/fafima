@@ -135,6 +135,14 @@ class TransactionManager extends Component
                 return;
             }
 
+            if ($transaction->is_target_funding && $transaction->target_id) {
+                $target = \App\Models\Target::find($transaction->target_id);
+                if ($target) {
+                    $target->current_amount = max(0, $target->current_amount - $transaction->amount);
+                    $target->save();
+                }
+            }
+
             $transaction->delete();
             $this->deletingId = null;
             session()->flash('success', 'Transaksi berhasil dihapus!');

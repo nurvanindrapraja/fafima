@@ -22,6 +22,18 @@ class TargetManager extends Component
     public bool $showFundForm = false;
     public ?int $fundingTargetId = null;
     public string $fund_amount = '';
+    public string $fund_description = '';
+
+    // Topup History Filters & Delete
+    public string $filterMonth = '';
+    public string $filterDescription = '';
+    public string $filterTargetId = '';
+    public ?int $deletingTopupId = null;
+
+    public function mount(): void
+    {
+        $this->filterMonth = now()->format('Y-m');
+    }
 
     protected $rules = [
         'name'          => 'required|string|max:255',
@@ -153,6 +165,7 @@ class TargetManager extends Component
     {
         $this->fundingTargetId = $targetId;
         $this->fund_amount = '';
+        $this->fund_description = '';
         $this->showFundForm = true;
     }
 
@@ -161,22 +174,28 @@ class TargetManager extends Component
         $this->showFundForm = false;
         $this->fundingTargetId = null;
         $this->fund_amount = '';
+        $this->fund_description = '';
     }
 
     public function fundTarget(): void
     {
         $this->validate([
-            'fund_amount' => 'required|numeric|min:1'
+            'fund_amount' => 'required|numeric|min:1',
+            'fund_description' => 'nullable|string|max:255',
         ], [
             'fund_amount.required' => 'Jumlah dana wajib diisi.',
             'fund_amount.numeric'  => 'Jumlah dana harus berupa angka.',
             'fund_amount.min'      => 'Jumlah dana minimal 1.',
+            'fund_description.max' => 'Keterangan maksimal 255 karakter.',
         ]);
 
         $user = Auth::user();
         $target = Target::where('family_id', $user->family_id)
             ->where('status', 'active')
             ->findOrFail($this->fundingTargetId);
+
+        $desc = trim($this->fund_description);
+        $finalDesc = $desc !== '' ? $desc : ('Pendanaan Target: ' . $target->name);
 
         \App\Models\Transaction::create([
             'family_id' => $user->family_id,
@@ -185,7 +204,7 @@ class TargetManager extends Component
             'type' => 'expense',
             'amount' => $this->fund_amount,
             'date' => now(),
-            'description' => 'Pendanaan Target: ' . $target->name,
+            'description' => $finalDesc,
             'is_target_funding' => true,
         ]);
 
@@ -193,6 +212,47 @@ class TargetManager extends Component
 
         $this->closeFundForm();
         session()->flash('success', 'Berhasil mendanai target!');
+    }
+
+    public function confirmDeleteTopup(int $id): void
+    {
+        $this->deletingTopupId = $id;
+    }
+
+    public function cancelDeleteTopup(): void
+    {
+        $this->deletingTopupId = null;
+    }
+
+    public function deleteTopup(): void
+    {
+        $user = Auth::user();
+        if ($user->role !== 'owner') return;
+
+        if ($this->deletingTopupId) {
+            $transaction = \App\Models\Transaction::where('family_id', $user->family_id)
+                ->where('is_target_funding', true)
+                ->findOrFail($this->deletingTopupId);
+
+            if ($transaction->target_id) {
+                $target = Target::find($transaction->target_id);
+                if ($target) {
+                    $target->current_amount = max(0, $target->current_amount - $transaction->amount);
+                    $target->save();
+                }
+            }
+
+            $transaction->delete();
+            $this->deletingTopupId = null;
+            session()->flash('success', 'Riwayat top up dan transaksi pengeluaran berhasil dihapus!');
+        }
+    }
+
+    public function resetTopupFilters(): void
+    {
+        $this->filterMonth = now()->format('Y-m');
+        $this->filterDescription = '';
+        $this->filterTargetId = '';
     }
 
     public function cancelDelete(): void
@@ -223,6 +283,29 @@ class TargetManager extends Component
             ->where('status', 'pending')
             ->get();
 
-        return view('livewire.target-manager', compact('targets', 'myPendingApprovals'));
+        // Topup Histories with Filters
+        $topupQuery = \App\Models\Transaction::with(['target', 'user'])
+            ->where('family_id', $user->family_id)
+            ->where('is_target_funding', true);
+
+        if ($this->filterMonth) {
+            $parts = explode('-', $this->filterMonth);
+            if (count($parts) === 2) {
+                $topupQuery->whereYear('date', (int)$parts[0])
+                           ->whereMonth('date', (int)$parts[1]);
+            }
+        }
+
+        if ($this->filterDescription !== '') {
+            $topupQuery->where('description', 'like', '%' . $this->filterDescription . '%');
+        }
+
+        if ($this->filterTargetId !== '') {
+            $topupQuery->where('target_id', $this->filterTargetId);
+        }
+
+        $topupHistories = $topupQuery->orderByDesc('date')->orderByDesc('id')->get();
+
+        return view('livewire.target-manager', compact('targets', 'myPendingApprovals', 'topupHistories'));
     }
 }
