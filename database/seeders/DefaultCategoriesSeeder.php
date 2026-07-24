@@ -13,7 +13,7 @@ class DefaultCategoriesSeeder extends Seeder
         $expenseCategories = [
             'Makanan & Minuman', 'Transport', 'Belanja Bulanan', 'Tagihan Listrik',
             'Tagihan Air', 'Tagihan Internet', 'Kesehatan', 'Pendidikan',
-            'Hiburan', 'Pakaian', 'Perawatan Rumah', 'Olahraga', 'Lain-lain',
+            'Hiburan', 'Pakaian', 'Perawatan Rumah', 'Olahraga', 'Tabungan', 'Lain-lain',
         ];
 
         $incomeCategories = [

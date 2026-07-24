@@ -38,13 +38,13 @@ class TargetTopupHistoryTest extends TestCase
             ->assertSee('Riwayat Top Up Dana Target')
             ->assertSee('Nabung bonus kerja Juli');
 
-        $this->assertDatabaseHas('transactions', [
-            'family_id' => $family->id,
-            'target_id' => $target->id,
-            'amount' => 500000,
-            'description' => 'Nabung bonus kerja Juli',
-            'is_target_funding' => true,
-        ]);
+        $tx = Transaction::where('family_id', $family->id)->where('target_id', $target->id)->first();
+        $this->assertNotNull($tx);
+        $this->assertEquals(500000, $tx->amount);
+        $this->assertEquals('Nabung bonus kerja Juli', $tx->description);
+        $this->assertTrue($tx->is_target_funding);
+        $this->assertEquals('expense', $tx->type);
+        $this->assertEquals('Tabungan', $tx->category->name);
 
         $this->assertEquals(500000, $target->fresh()->current_amount);
     }

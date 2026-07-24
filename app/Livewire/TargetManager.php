@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Target;
 use App\Models\TargetApproval;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 
 class TargetManager extends Component
@@ -197,10 +198,25 @@ class TargetManager extends Component
         $desc = trim($this->fund_description);
         $finalDesc = $desc !== '' ? $desc : ('Pendanaan Target: ' . $target->name);
 
+        // Find or create 'Tabungan' expense category
+        $tabunganCategory = Category::where(function ($q) use ($user) {
+            $q->where('family_id', $user->family_id)->orWhereNull('family_id');
+        })->where('name', 'Tabungan')->where('type', 'expense')->first();
+
+        if (!$tabunganCategory) {
+            $tabunganCategory = Category::create([
+                'name' => 'Tabungan',
+                'type' => 'expense',
+                'family_id' => null,
+                'is_default' => true,
+            ]);
+        }
+
         \App\Models\Transaction::create([
             'family_id' => $user->family_id,
             'user_id' => $user->id,
             'target_id' => $target->id,
+            'category_id' => $tabunganCategory->id,
             'type' => 'expense',
             'amount' => $this->fund_amount,
             'date' => now(),
