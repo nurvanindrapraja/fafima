@@ -327,15 +327,149 @@
                 }));
             });
 
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js').then(registration => {
-                        console.log('SW registered: ', registration);
-                    }).catch(registrationError => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
+            // PWA Install Prompt & Update Handling
+            (function() {
+                let deferredInstallPrompt = null;
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+                const ua = navigator.userAgent;
+                const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+                const isAndroid = /Android/i.test(ua);
+                const isMobile = isIOS || isAndroid || /Mobi|Android/i.test(ua);
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredInstallPrompt = e;
+                    showInstallPrompt();
                 });
-            }
+
+                function showInstallPrompt() {
+                    if (isStandalone || !isMobile) return;
+                    if (sessionStorage.getItem('fafima_pwa_install_dismissed')) return;
+
+                    setTimeout(() => {
+                        if (isIOS) {
+                            Swal.fire({
+                                title: '📱 Instal Fafima di iPhone',
+                                html: `
+                                    <div style="text-align: left; font-size: 13px; line-height: 1.6; color: #cbd5e1;">
+                                        <p class="mb-3">Tambahkan Fafima ke Layar Utama iPhone Anda untuk akses instan tanpa membuka browser Safari:</p>
+                                        <ol style="margin-left: 18px; margin-top: 8px; padding-left: 4px;">
+                                            <li style="margin-bottom: 8px;">
+                                                Ketuk ikon <b>Bagikan (Share)</b> <span style="display:inline-block; padding: 2px 6px; background: rgba(59,130,246,0.25); border-radius: 6px; color: #60a5fa; font-weight: bold;">⎋</span> di bilah bawah Safari.
+                                            </li>
+                                            <li style="margin-bottom: 8px;">
+                                                Gulir ke bawah lalu pilih <b>"Tambah ke Layar Utama" (Add to Home Screen)</b>.
+                                            </li>
+                                            <li>
+                                                Ketuk <b>"Tambah"</b> di sudut kanan atas.
+                                            </li>
+                                        </ol>
+                                    </div>
+                                `,
+                                iconHtml: '<img src="/icon_fafima_small.png" style="width: 48px; height: 48px; border-radius: 12px;" />',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3b82f6',
+                                cancelButtonColor: '#475569',
+                                confirmButtonText: 'Saya Mengerti',
+                                cancelButtonText: 'Nanti Saja',
+                                background: '#1e293b',
+                                color: '#fff',
+                                customClass: {
+                                    popup: 'border border-slate-700/50 rounded-2xl shadow-2xl'
+                                }
+                            }).then(() => {
+                                sessionStorage.setItem('fafima_pwa_install_dismissed', '1');
+                            });
+                        } else if (deferredInstallPrompt) {
+                            Swal.fire({
+                                title: '📲 Instal Fafima di HP Anda',
+                                text: 'Instal Fafima di perangkat mobile Anda untuk akses lebih cepat, responsif, dan mudah digunakan tanpa membuka browser.',
+                                iconHtml: '<img src="/icon_fafima_small.png" style="width: 48px; height: 48px; border-radius: 12px;" />',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3b82f6',
+                                cancelButtonColor: '#475569',
+                                confirmButtonText: 'Instal Sekarang',
+                                cancelButtonText: 'Nanti Saja',
+                                background: '#1e293b',
+                                color: '#fff',
+                                customClass: {
+                                    popup: 'border border-slate-700/50 rounded-2xl shadow-2xl'
+                                }
+                            }).then((result) => {
+                                sessionStorage.setItem('fafima_pwa_install_dismissed', '1');
+                                if (result.isConfirmed && deferredInstallPrompt) {
+                                    deferredInstallPrompt.prompt();
+                                    deferredInstallPrompt.userChoice.then((choiceResult) => {
+                                        console.log('User install choice:', choiceResult.outcome);
+                                        deferredInstallPrompt = null;
+                                    });
+                                }
+                            });
+                        }
+                    }, 1200);
+                }
+
+                window.addEventListener('load', () => {
+                    showInstallPrompt();
+                });
+
+                // Service Worker Registration & Update Confirmation Prompt
+                if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('/sw.js').then(registration => {
+                            console.log('SW registered:', registration);
+
+                            function promptForUpdate(worker) {
+                                Swal.fire({
+                                    title: '🚀 Pembaruan Aplikasi Tersedia!',
+                                    text: 'Versi terbaru Fafima telah tersedia. Perbarui sekarang untuk mendapatkan fitur dan perbaikan terbaru.',
+                                    icon: 'info',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3b82f6',
+                                    cancelButtonColor: '#475569',
+                                    confirmButtonText: 'Perbarui Sekarang',
+                                    cancelButtonText: 'Nanti',
+                                    background: '#1e293b',
+                                    color: '#fff',
+                                    customClass: {
+                                        popup: 'border border-slate-700/50 rounded-2xl shadow-2xl'
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        worker.postMessage({ type: 'SKIP_WAITING' });
+                                        worker.postMessage('skipWaiting');
+                                    }
+                                });
+                            }
+
+                            if (registration.waiting) {
+                                promptForUpdate(registration.waiting);
+                            }
+
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                if (newWorker) {
+                                    newWorker.addEventListener('statechange', () => {
+                                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                            promptForUpdate(newWorker);
+                                        }
+                                    });
+                                }
+                            });
+                        }).catch(err => {
+                            console.log('SW registration failed:', err);
+                        });
+
+                        let refreshing = false;
+                        navigator.serviceWorker.addEventListener('controllerchange', () => {
+                            if (!refreshing) {
+                                refreshing = true;
+                                window.location.reload();
+                            }
+                        });
+                    });
+                }
+            })();
 
             window.confirmLogout = function(e, form) {
                 e.preventDefault();

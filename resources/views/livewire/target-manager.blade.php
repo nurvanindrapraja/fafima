@@ -61,7 +61,7 @@
     </div>
 
     {{-- Loading Bar --}}
-    <div wire:loading class="w-full h-1 bg-slate-700 rounded overflow-hidden">
+    <div wire:loading wire:target="save, deleteTarget, approve, reject, bypass" class="w-full h-1 bg-slate-700 rounded overflow-hidden">
         <div class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 animate-pulse rounded"></div>
     </div>
 

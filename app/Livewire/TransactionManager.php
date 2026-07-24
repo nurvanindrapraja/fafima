@@ -31,6 +31,7 @@ class TransactionManager extends Component
     public string $search = '';
     public string $filterType = '';
     public string $filterMonth = '';
+    public string $filterUserId = '';
 
     // Confirmation delete
     public ?int $deletingId = null;
@@ -249,6 +250,10 @@ class TransactionManager extends Component
             $query->where('type', $this->filterType);
         }
 
+        if ($this->filterUserId) {
+            $query->where('user_id', $this->filterUserId);
+        }
+
         if ($this->filterMonth) {
             [$year, $month] = explode('-', $this->filterMonth);
             $query->whereYear('date', $year)->whereMonth('date', $month);
@@ -264,8 +269,10 @@ class TransactionManager extends Component
             $q->where('family_id', $user->family_id)->orWhereNull('family_id');
         })->orderBy('name')->get();
 
+        $familyMembers = $user->family ? $user->family->members()->orderBy('name')->get() : collect();
+
         return view('livewire.transaction-manager', compact(
-            'transactions', 'categories', 'incomeTotal', 'expenseTotal'
+            'transactions', 'categories', 'incomeTotal', 'expenseTotal', 'familyMembers'
         ));
     }
 }

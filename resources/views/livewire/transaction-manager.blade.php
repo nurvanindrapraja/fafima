@@ -40,13 +40,19 @@
     </div>
 
     {{-- Filters --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <input wire:model.live.debounce.400ms="search" type="text" placeholder="🔍 Cari deskripsi atau kategori..."
-            class="input-dark col-span-1 sm:col-span-1 text-sm" id="input-search-transaksi">
+            class="input-dark text-sm" id="input-search-transaksi">
         <select wire:model.live="filterType" class="input-dark text-sm" id="filter-jenis">
             <option value="">Semua Jenis</option>
             <option value="income">Pemasukan</option>
             <option value="expense">Pengeluaran</option>
+        </select>
+        <select wire:model.live="filterUserId" class="input-dark text-sm" id="filter-anggota">
+            <option value="">Semua Anggota Keluarga</option>
+            @foreach($familyMembers as $member)
+                <option value="{{ $member->id }}">{{ $member->name }} {{ $member->id === Auth::id() ? '(Saya)' : '' }}</option>
+            @endforeach
         </select>
         <input wire:model.live="filterMonth" type="month" class="input-dark text-sm" id="filter-bulan">
     </div>

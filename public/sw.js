@@ -2,7 +2,7 @@ const CACHE_NAME = 'fafima-cache-v1';
 const urlsToCache = [
     '/',
     '/manifest.json',
-    '/build/assets/app-C1D4qvwq.css', // This will change on build, but this is a simple SW example
+    '/icon_fafima_small.png',
 ];
 
 self.addEventListener('install', event => {
@@ -14,14 +14,33 @@ self.addEventListener('install', event => {
     );
 });
 
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cache => {
+                    if (cache !== CACHE_NAME) {
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        }).then(() => self.clients.claim())
+    );
+});
+
+self.addEventListener('message', event => {
+    if (event.data && (event.data.type === 'SKIP_WAITING' || event.data === 'skipWaiting')) {
+        self.skipWaiting();
+    }
+});
+
 self.addEventListener('fetch', event => {
-    // Basic network-first strategy for dynamic content, cache-first for static assets
+    // Network-first strategy for HTML/dynamic content, fallback to cache
     if (event.request.method !== 'GET') return;
 
     event.respondWith(
         fetch(event.request).then(response => {
             return caches.open(CACHE_NAME).then(cache => {
-                // Cache valid responses
                 if (response.status === 200) {
                     cache.put(event.request, response.clone());
                 }
@@ -42,7 +61,7 @@ self.addEventListener('push', function (e) {
         var msg = e.data.json();
         e.waitUntil(self.registration.showNotification(msg.title, {
             body: msg.body,
-            icon: msg.icon || '/icon-192x192.png',
+            icon: msg.icon || '/icons/icon-192x192.png',
             actions: msg.actions || [],
             data: msg.data || {}
         }));
